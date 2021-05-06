@@ -1,0 +1,24 @@
+function deleteCalendarEvents() {
+  var spreadSheet = SpreadsheetApp.openById("1SM1RWuStgtpxW6H18nXyHOYQW2Vsa7-tum9yo-g-0kE");
+  var calendar = CalendarApp.getCalendarById('lt3u5pjgnu44p304ntsqs1h5nk@group.calendar.google.com');
+  var ID = "1SM1RWuStgtpxW6H18nXyHOYQW2Vsa7-tum9yo-g-0kE"
+  var sheet = spreadSheet.getSheetByName("Target")
+  var startRow = Number("2");  // First row of data to process - 2 exempts my header row
+  var numRows = sheet.getLastRow();   // Number of rows to process
+  var numColumns = sheet.getLastColumn();
+  var dataRange = sheet.getRange(startRow, 1, numRows-1, numColumns);
+  var data = dataRange.getValues();
+ 
+  for (var i = 0; i < data.length; ++i) {
+    
+    var row = data[i];
+    var eventID = row[5]; //if there's an ID here, then it's already been created
+    if (eventID != "") {
+      var currentCell = sheet.getRange(startRow + i, numColumns); //set the current cell as the intersection of the last column with current row
+      var event = calendar.getEventById(eventID)
+      event.deleteEvent()
+      currentCell.setValue(""); //remove id
+
+    }
+  }
+}
