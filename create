@@ -1,0 +1,34 @@
+function createCalendarEventsFromSpreadSheet() {
+  var spreadSheet = SpreadsheetApp.openById("1SM1RWuStgtpxW6H18nXyHOYQW2Vsa7-tum9yo-g-0kE");
+  var calendar = CalendarApp.getCalendarById('lt3u5pjgnu44p304ntsqs1h5nk@group.calendar.google.com');
+  var ID = "1SM1RWuStgtpxW6H18nXyHOYQW2Vsa7-tum9yo-g-0kE"
+  var sheet = spreadSheet.getSheetByName("Target")
+  var startRow = Number("2");  // First row of data to process - 2 exempts my header row
+  var numRows = sheet.getLastRow();   // Number of rows to process
+  var numColumns = sheet.getLastColumn();
+  var dataRange = sheet.getRange(startRow, 1, numRows-1, numColumns);
+  var data = dataRange.getValues();
+
+  for (var i = 0; i < data.length; ++i) {
+    
+    var row = data[i];
+    var startDate = new Date(row[0]);  //start date
+    var endDate = new Date(row[1]); //end date - must be +1 day from start
+    var name = row[2];
+    var notes = row[3];  //Notes i.e. description of event
+    var isCreated = row[5]; //if there's an ID here, then it's already been created
+
+    if (isCreated == "") {
+      var currentCell = sheet.getRange(startRow + i, numColumns); //set the current cell  
+      var event = calendar.createAllDayEvent(name, startDate, endDate, {
+        description: notes,
+        colorId: 11
+      })
+      var eventID = event.getId();   //get the newly created eventID
+      
+      currentCell.setValue(eventID); //add id to spreadsheet for future reference (i.e. to delete if required)
+
+    }
+  }
+}
+
